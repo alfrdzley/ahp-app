@@ -64,7 +64,7 @@ async function loadPrograms() {
           label: "Skor Akhir",
           data: scores,
           backgroundColor: scores.map((score) =>
-            score === maxScore ? "orange" : "skyblue"
+            score === maxScore ? "red" : "skyblue"
           ),
         },
       ],
