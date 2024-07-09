@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AHP App</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <h1>AHP Program Studi</h1>
+    <form id="program-form">
+      <input type="text" id="nama" placeholder="Nama Program Studi" required />
+      <input
+        type="number"
+        id="demand"
+        placeholder="Demand"
+        step="0.01"
+        required
+      />
+      <input type="number" id="cost" placeholder="Cost" step="0.01" required />
+      <input
+        type="number"
+        id="resources"
+        placeholder="Resources"
+        step="0.01"
+        required
+      />
+      <input
+        type="number"
+        id="academic_relevance"
+        placeholder="Academic Relevance"
+        step="0.01"
+        required
+      />
+      <input
+        type="number"
+        id="student_interest"
+        placeholder="Student Interest"
+        step="0.01"
+        required
+      />
+      <button type="submit">Add Program</button>
+    </form>
+    <canvas id="myChart" width="400" height="200"></canvas>
+    <script src="app.js"></script>
+  </body>
+</html>
