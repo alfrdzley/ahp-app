@@ -5,6 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AHP App</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!--
+      This code block contains the CSS styles for the chart container and canvas element.
+      
+      CSS Styles:
+      - #myChart-container: Sets the width and height of the chart container to 600px and 400px respectively.
+      - canvas: Sets the display property to block and adjusts the width and height to 100% of the parent container.
+    -->
+    <style>
+      #myChart-container {
+        width: 600px;
+        height: 400px;
+      }
+      canvas {
+        display: block;
+        width: 100% !important;
+        height: 100% !important;
+      }
+    </style>
   </head>
   <body>
     <h1>AHP Program Studi</h1>
@@ -41,7 +59,9 @@
       />
       <button type="submit">Add Program</button>
     </form>
-    <canvas id="myChart" width="400" height="200"></canvas>
+    <div id="myChart-container">
+      <canvas id="myChart"></canvas>
+    </div>
     <script src="app.js"></script>
   </body>
 </html>

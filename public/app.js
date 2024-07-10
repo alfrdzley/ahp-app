@@ -13,76 +13,115 @@ document
       document.getElementById("student_interest").value
     );
 
-    const response = await fetch("/programs", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        nama,
-        demand,
-        cost,
-        resources,
-        academic_relevance,
-        student_interest,
-      }),
+    console.log("Submitting:", {
+      nama,
+      demand,
+      cost,
+      resources,
+      academic_relevance,
+      student_interest,
     });
 
-    if (response.ok) {
-      loadPrograms();
+    try {
+      const response = await fetch("/programs", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nama,
+          demand,
+          cost,
+          resources,
+          academic_relevance,
+          student_interest,
+        }),
+      });
+
+      if (response.ok) {
+        console.log("Data submitted successfully");
+        loadPrograms();
+      } else {
+        console.error(
+          "Failed to submit data",
+          response.status,
+          response.statusText
+        );
+      }
+    } catch (error) {
+      console.error("Error submitting data:", error);
     }
   });
 
 async function loadPrograms() {
-  const response = await fetch("/programs");
-  const programs = await response.json();
+  try {
+    const response = await fetch("/programs");
+    if (!response.ok) {
+      console.error(
+        "Failed to load programs",
+        response.status,
+        response.statusText
+      );
+      return;
+    }
 
-  const names = programs.map((p) => p.nama);
-  const scores = programs.map((p) => {
-    const weights = [0.3, 0.2, 0.2, 0.15, 0.15];
-    const values = [
-      p.demand,
-      p.cost,
-      p.resources,
-      p.academic_relevance,
-      p.student_interest,
-    ];
-    return values.reduce((acc, val, i) => acc + val * weights[i], 0);
-  });
+    const programs = await response.json();
+    console.log("Programs loaded:", programs);
 
-  const maxScore = Math.max(...scores);
-  const bestProgramIndex = scores.indexOf(maxScore);
-  const bestProgramName = names[bestProgramIndex];
+    const names = programs.map((p) => p.nama);
+    const scores = programs.map((p) => {
+      const weights = [0.3, 0.2, 0.2, 0.15, 0.15];
+      const values = [
+        p.demand,
+        p.cost,
+        p.resources,
+        p.academic_relevance,
+        p.student_interest,
+      ];
+      return values.reduce((acc, val, i) => acc + val * weights[i], 0);
+    });
 
-  const ctx = document.getElementById("myChart").getContext("2d");
-  new Chart(ctx, {
-    type: "bar",
-    data: {
-      labels: names,
-      datasets: [
-        {
-          label: "Skor Akhir",
-          data: scores,
-          backgroundColor: scores.map((score) =>
-            score === maxScore ? "red" : "skyblue"
-          ),
+    console.log("Scores:", scores);
+
+    const maxScore = Math.max(...scores);
+    const bestProgramIndex = scores.indexOf(maxScore);
+    const bestProgramName = names[bestProgramIndex];
+
+    const ctx = document.getElementById("myChart").getContext("2d");
+    if (window.myChart) {
+      window.myChart.destroy();
+    }
+    window.myChart = new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: names,
+        datasets: [
+          {
+            label: "Skor Akhir",
+            data: scores,
+            backgroundColor: scores.map((score) =>
+              score === maxScore ? "red" : "skyblue"
+            ),
+          },
+        ],
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true,
+          },
         },
-      ],
-    },
-    options: {
-      scales: {
-        y: {
-          beginAtZero: true,
+        plugins: {
+          title: {
+            display: true,
+            text: `Program Studi Terbaik: ${bestProgramName}`,
+          },
         },
       },
-      plugins: {
-        title: {
-          display: true,
-          text: `Program Studi Terbaik: ${bestProgramName}`,
-        },
-      },
-    },
-  });
+    });
+  } catch (error) {
+    console.error("Error loading programs:", error);
+  }
 }
 
 loadPrograms();
