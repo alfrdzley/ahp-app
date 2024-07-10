@@ -5,22 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AHP App</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!--
-      This code block contains the CSS styles for the chart container and canvas element.
-      
-      CSS Styles:
-      - #myChart-container: Sets the width and height of the chart container to 600px and 400px respectively.
-      - canvas: Sets the display property to block and adjusts the width and height to 100% of the parent container.
-    -->
     <style>
       #myChart-container {
         width: 600px;
         height: 400px;
+        margin: auto;
       }
-      canvas {
-        display: block;
+      #myChart {
         width: 100% !important;
         height: 100% !important;
+      }
+      .program-list {
+        margin-top: 20px;
+      }
+      .program-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
       }
     </style>
   </head>
@@ -62,6 +63,7 @@
     <div id="myChart-container">
       <canvas id="myChart"></canvas>
     </div>
+    <div class="program-list" id="program-list"></div>
     <script src="app.js"></script>
   </body>
 </html>

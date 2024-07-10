@@ -68,6 +68,8 @@ async function loadPrograms() {
     const programs = await response.json();
     console.log("Programs loaded:", programs);
 
+    displayPrograms(programs);
+
     const names = programs.map((p) => p.nama);
     const scores = programs.map((p) => {
       const weights = [0.3, 0.2, 0.2, 0.15, 0.15];
@@ -87,10 +89,29 @@ async function loadPrograms() {
     const bestProgramIndex = scores.indexOf(maxScore);
     const bestProgramName = names[bestProgramIndex];
 
-    const ctx = document.getElementById("myChart").getContext("2d");
-    if (window.myChart) {
+    console.log("Initializing Chart.js with data:", {
+      names,
+      scores,
+      bestProgramName,
+    });
+
+    const canvas = document.getElementById("myChart");
+    if (!canvas) {
+      console.error("Canvas element not found");
+      return;
+    }
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+      console.error("Failed to get canvas context");
+      return;
+    }
+
+    console.log("Creating Chart.js instance");
+    if (window.myChart instanceof Chart) {
       window.myChart.destroy();
     }
+
     window.myChart = new Chart(ctx, {
       type: "bar",
       data: {
@@ -119,8 +140,44 @@ async function loadPrograms() {
         },
       },
     });
+    console.log("Chart.js instance created");
   } catch (error) {
     console.error("Error loading programs:", error);
+  }
+}
+
+function displayPrograms(programs) {
+  const programList = document.getElementById("program-list");
+  programList.innerHTML = "";
+  programs.forEach((program) => {
+    const programItem = document.createElement("div");
+    programItem.className = "program-item";
+    programItem.innerHTML = `
+      <span>${program.nama}</span>
+      <button onclick="deleteProgram('${program.nama}')">Hapus</button>
+    `;
+    programList.appendChild(programItem);
+  });
+}
+
+async function deleteProgram(nama) {
+  try {
+    const response = await fetch(`/programs/${nama}`, {
+      method: "DELETE",
+    });
+
+    if (response.ok) {
+      console.log(`Program ${nama} deleted successfully`);
+      loadPrograms();
+    } else {
+      console.error(
+        `Failed to delete program ${nama}`,
+        response.status,
+        response.statusText
+      );
+    }
+  } catch (error) {
+    console.error(`Error deleting program ${nama}:`, error);
   }
 }
 
