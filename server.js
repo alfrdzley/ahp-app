@@ -21,7 +21,11 @@ app.use(express.static("public"));
 
 app.get("/programs", (req, res) => {
   connection.query("SELECT * FROM program_studi", (err, results) => {
-    if (err) throw err;
+    if (err) {
+      console.error("Error fetching data:", err);
+      res.status(500).send("Internal Server Error");
+      return;
+    }
     res.json(results);
   });
 });
@@ -41,7 +45,11 @@ app.post("/programs", (req, res) => {
     query,
     [nama, demand, cost, resources, academic_relevance, student_interest],
     (err) => {
-      if (err) throw err;
+      if (err) {
+        console.error("Error inserting data:", err);
+        res.status(500).send("Internal Server Error");
+        return;
+      }
       res.sendStatus(200);
     }
   );
@@ -51,7 +59,11 @@ app.delete("/programs/:name", (req, res) => {
   const { name } = req.params;
   const query = "DELETE FROM program_studi WHERE nama = ?";
   connection.query(query, [name], (err) => {
-    if (err) throw err;
+    if (err) {
+      console.error("Error deleting data:", err);
+      res.status(500).send("Internal Server Error");
+      return;
+    }
     res.sendStatus(200);
   });
 });

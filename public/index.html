@@ -5,6 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AHP App</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      #myChart-container {
+        width: 600px;
+        height: 400px;
+        margin: auto;
+      }
+      #myChart {
+        width: 100% !important;
+        height: 100% !important;
+      }
+      .program-list {
+        margin-top: 20px;
+      }
+      .program-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+      }
+    </style>
   </head>
   <body>
     <h1>AHP Program Studi</h1>
@@ -41,7 +60,10 @@
       />
       <button type="submit">Add Program</button>
     </form>
-    <canvas id="myChart" width="400" height="200"></canvas>
+    <div id="myChart-container">
+      <canvas id="myChart"></canvas>
+    </div>
+    <div class="program-list" id="program-list"></div>
     <script src="app.js"></script>
   </body>
 </html>
