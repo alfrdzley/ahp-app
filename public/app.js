@@ -154,15 +154,121 @@ function displayPrograms(programs) {
     programItem.className = "program-item";
     programItem.innerHTML = `
       <span>${program.nama}</span>
-      <button onclick="deleteProgram('${program.nama}')">Hapus</button>
+      <button onclick="viewDetails('${encodeURIComponent(
+        program.nama
+      )}')">Lihat Detail</button>
+      <button onclick="deleteProgram('${encodeURIComponent(
+        program.nama
+      )}')">Hapus</button>
     `;
     programList.appendChild(programItem);
   });
 }
 
-async function deleteProgram(nama) {
+async function viewDetails(nama) {
+  const modal = document.getElementById("detailModal");
+  const closeModal = document.getElementById("closeDetailModal");
+
+  console.log(`Fetching details for program: ${nama}`);
+
   try {
-    const response = await fetch(`/programs/${nama}`, {
+    const response = await fetch(`/programs/${nama}`);
+    if (!response.ok) {
+      console.error(
+        `Failed to fetch details for program ${nama}`,
+        response.status,
+        response.statusText
+      );
+      return;
+    }
+    const program = await response.json();
+
+    console.log(`Details fetched for program ${nama}:`, program);
+
+    document.getElementById("update-nama").value = program.nama;
+    document.getElementById("update-demand").value = program.demand;
+    document.getElementById("update-cost").value = program.cost;
+    document.getElementById("update-resources").value = program.resources;
+    document.getElementById("update-academic_relevance").value =
+      program.academic_relevance;
+    document.getElementById("update-student_interest").value =
+      program.student_interest;
+
+    modal.style.display = "block";
+
+    closeModal.onclick = function () {
+      modal.style.display = "none";
+    };
+
+    window.onclick = function (event) {
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    };
+  } catch (error) {
+    console.error(`Error fetching details for program ${nama}:`, error);
+  }
+}
+
+document.getElementById("update-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const nama = document.getElementById("update-nama").value;
+  const demand = parseFloat(document.getElementById("update-demand").value);
+  const cost = parseFloat(document.getElementById("update-cost").value);
+  const resources = parseFloat(
+    document.getElementById("update-resources").value
+  );
+  const academic_relevance = parseFloat(
+    document.getElementById("update-academic_relevance").value
+  );
+  const student_interest = parseFloat(
+    document.getElementById("update-student_interest").value
+  );
+
+  console.log("Updating:", {
+    nama,
+    demand,
+    cost,
+    resources,
+    academic_relevance,
+    student_interest,
+  });
+
+  try {
+    const response = await fetch(`/programs/${encodeURIComponent(nama)}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        demand,
+        cost,
+        resources,
+        academic_relevance,
+        student_interest,
+      }),
+    });
+
+    if (response.ok) {
+      console.log("Data updated successfully");
+      document.getElementById("detailModal").style.display = "none";
+      loadPrograms();
+    } else {
+      console.error(
+        "Failed to update data",
+        response.status,
+        response.statusText
+      );
+    }
+  } catch (error) {
+    console.error("Error updating data:", error);
+  }
+});
+
+async function deleteProgram(nama) {
+  console.log(`Deleting program: ${nama}`);
+  try {
+    const response = await fetch(`/programs/${encodeURIComponent(nama)}`, {
       method: "DELETE",
     });
 
