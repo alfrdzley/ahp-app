@@ -21,7 +21,45 @@
       .program-item {
         display: flex;
         justify-content: space-between;
+        align-items: center;
         margin-bottom: 10px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+      .program-item button {
+        margin-left: 10px;
+      }
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgb(0, 0, 0);
+        background-color: rgba(0, 0, 0, 0.4);
+      }
+      .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+      }
+      .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+      }
+      .close:hover,
+      .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
       }
     </style>
   </head>
@@ -64,6 +102,39 @@
       <canvas id="myChart"></canvas>
     </div>
     <div class="program-list" id="program-list"></div>
+
+    <!-- The Modal for Detail and Update -->
+    <div id="detailModal" class="modal">
+      <div class="modal-content">
+        <span class="close" id="closeDetailModal">&times;</span>
+        <h2>Detail Program Studi</h2>
+        <form id="update-form">
+          <input type="hidden" id="update-nama" />
+          <label for="update-demand">Demand:</label>
+          <input type="number" id="update-demand" step="0.01" required />
+          <label for="update-cost">Cost:</label>
+          <input type="number" id="update-cost" step="0.01" required />
+          <label for="update-resources">Resources:</label>
+          <input type="number" id="update-resources" step="0.01" required />
+          <label for="update-academic_relevance">Academic Relevance:</label>
+          <input
+            type="number"
+            id="update-academic_relevance"
+            step="0.01"
+            required
+          />
+          <label for="update-student_interest">Student Interest:</label>
+          <input
+            type="number"
+            id="update-student_interest"
+            step="0.01"
+            required
+          />
+          <button type="submit">Update Program</button>
+        </form>
+      </div>
+    </div>
+
     <script src="app.js"></script>
   </body>
 </html>
