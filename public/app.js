@@ -13,14 +13,14 @@ document
       document.getElementById("student_interest").value
     );
 
-    // console.log("Adding program:", {
-    //   nama,
-    //   demand,
-    //   cost,
-    //   resources,
-    //   academic_relevance,
-    //   student_interest,
-    // });
+    console.log("Adding program:", {
+      nama,
+      demand,
+      cost,
+      resources,
+      academic_relevance,
+      student_interest,
+    });
 
     try {
       const response = await fetch("/programs", {
@@ -66,7 +66,7 @@ async function loadPrograms() {
     }
 
     const programs = await response.json();
-    // console.log("Programs loaded:", programs);
+    console.log("Programs loaded:", programs);
 
     displayPrograms(programs);
 
@@ -83,11 +83,8 @@ async function loadPrograms() {
       return values.reduce((acc, val, i) => acc + val * weights[i], 0);
     });
 
-    // console.log("Scores:", scores);
+    console.log("Scores:", scores);
 
-    const maxScore = Math.max(...scores);
-    const bestProgramIndex = scores.indexOf(maxScore);
-    const bestProgramName = names[bestProgramIndex];
     const maxScore = Math.max(...scores);
     const bestProgramIndex = scores.indexOf(maxScore);
     const bestProgramName = names[bestProgramIndex];
@@ -157,37 +154,32 @@ function displayPrograms(programs) {
     programItem.className = "program-item";
     programItem.innerHTML = `
       <span>${program.nama}</span>
-      <button onclick="viewDetails('${encodeURIComponent(
-        program.nama
-      )}')">Lihat Detail</button>
-      <button onclick="deleteProgram('${encodeURIComponent(
-        program.nama
-      )}')">Hapus</button>
+      <button onclick="viewDetails(${program.id})">Lihat Detail</button>
+      <button onclick="deleteProgram(${program.id})">Hapus</button>
     `;
     programList.appendChild(programItem);
   });
 }
 
-async function viewDetails(nama) {
+async function viewDetails(id) {
+  console.log(`Fetching details for program with ID: ${id}`);
   const modal = document.getElementById("detailModal");
   const closeModal = document.getElementById("closeDetailModal");
 
-  console.log(`Fetching details for program: ${nama}`);
-
   try {
-    const response = await fetch(`/programs/${nama}`);
+    const response = await fetch(`/programs/${id}`);
     if (!response.ok) {
       console.error(
-        `Failed to fetch details for program ${nama}`,
+        `Failed to fetch details for program ${id}`,
         response.status,
         response.statusText
       );
       return;
     }
     const program = await response.json();
+    console.log(`Details fetched for program ${id}:`, program);
 
-    console.log(`Details fetched for program ${nama}:`, program);
-
+    document.getElementById("update-id").value = program.id;
     document.getElementById("update-nama").value = program.nama;
     document.getElementById("update-demand").value = program.demand;
     document.getElementById("update-cost").value = program.cost;
@@ -209,7 +201,7 @@ async function viewDetails(nama) {
       }
     };
   } catch (error) {
-    console.error(`Error fetching details for program ${nama}:`, error);
+    console.error(`Error fetching details for program ${id}:`, error);
   }
 }
 
@@ -217,7 +209,7 @@ document
   .getElementById("update-form")
   .addEventListener("submit", async function (e) {
     e.preventDefault();
-    const nama = document.getElementById("update-nama").value;
+    const id = document.getElementById("update-id").value;
     const demand = parseFloat(document.getElementById("update-demand").value);
     const cost = parseFloat(document.getElementById("update-cost").value);
     const resources = parseFloat(
@@ -231,7 +223,7 @@ document
     );
 
     console.log("Updating program:", {
-      nama,
+      id,
       demand,
       cost,
       resources,
@@ -240,7 +232,7 @@ document
     });
 
     try {
-      const response = await fetch(`/programs/${encodeURIComponent(nama)}`, {
+      const response = await fetch(`/programs/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -270,25 +262,26 @@ document
     }
   });
 
-async function deleteProgram(nama) {
-  console.log(`Deleting program: ${nama}`);
+async function deleteProgram(id) {
+  console.log(`Preparing to delete program with ID: ${id}`);
+
   try {
-    const response = await fetch(`/programs/${encodeURIComponent(nama)}`, {
+    const response = await fetch(`/programs/${id}`, {
       method: "DELETE",
     });
 
     if (response.ok) {
-      console.log(`Program ${nama} deleted successfully`);
+      console.log(`Program with ID ${id} deleted successfully`);
       loadPrograms(); // Reload programs after deletion
     } else {
       console.error(
-        `Failed to delete program ${nama}`,
+        `Failed to delete program with ID ${id}`,
         response.status,
         response.statusText
       );
     }
   } catch (error) {
-    console.error(`Error deleting program ${nama}:`, error);
+    console.error(`Error deleting program with ID ${id}:`, error);
   }
 }
 

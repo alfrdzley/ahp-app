@@ -30,11 +30,11 @@ app.get("/programs", (req, res) => {
   });
 });
 
-app.get("/programs/:nama", (req, res) => {
-  const { nama } = req.params;
+app.get("/programs/:id", (req, res) => {
+  const { id } = req.params;
   connection.query(
-    "SELECT * FROM program_studi WHERE nama = ?",
-    [nama],
+    "SELECT * FROM program_studi WHERE id = ?",
+    [id],
     (err, results) => {
       if (err) {
         console.error("Error fetching data:", err);
@@ -60,54 +60,49 @@ app.post("/programs", (req, res) => {
   connection.query(
     query,
     [nama, demand, cost, resources, academic_relevance, student_interest],
-    (err) => {
+    (err, results) => {
       if (err) {
         console.error("Error inserting data:", err);
         res.status(500).send("Internal Server Error");
         return;
       }
-      res.sendStatus(200);
+      res.json({ id: results.insertId });
     }
   );
 });
 
-app.put("/programs/:nama", (req, res) => {
-  const { nama } = req.params;
+app.put("/programs/:id", (req, res) => {
+  const { id } = req.params;
   const { demand, cost, resources, academic_relevance, student_interest } =
     req.body;
   const query =
-    "UPDATE program_studi SET demand = ?, cost = ?, resources = ?, academic_relevance = ?, student_interest = ? WHERE nama = ?";
+    "UPDATE program_studi SET demand = ?, cost = ?, resources = ?, academic_relevance = ?, student_interest = ? WHERE id = ?";
   connection.query(
     query,
-    [demand, cost, resources, academic_relevance, student_interest, nama],
-    (err) => {
+    [demand, cost, resources, academic_relevance, student_interest, id],
+    (err, results) => {
       if (err) {
         console.error("Error updating data:", err);
         res.status(500).send("Internal Server Error");
         return;
       }
+      console.log(`Updated ${results.affectedRows} row(s)`);
       res.sendStatus(200);
     }
   );
 });
 
-app.delete("/programs/:nama", (req, res) => {
-  const { nama } = req.params;
-  const query = "DELETE FROM program_studi WHERE nama = ?";
-<<<<<<< HEAD
-  connection.query(query, [nama], (err, results) => {
-=======
-  connection.query(query, [name], (err) => {
->>>>>>> c1fc3bd3417412478e7367a2741e917c64d4e8f5
+app.delete("/programs/:id", (req, res) => {
+  const { id } = req.params;
+  console.log(`Deleting program with ID: ${id}`); // Tambahkan logging ini
+  const query = "DELETE FROM program_studi WHERE id = ?";
+  connection.query(query, [id], (err, results) => {
     if (err) {
       console.error("Error deleting data:", err);
       res.status(500).send("Internal Server Error");
       return;
     }
-<<<<<<< HEAD
     console.log(`Deleted ${results.affectedRows} row(s)`);
-=======
->>>>>>> c1fc3bd3417412478e7367a2741e917c64d4e8f5
     res.sendStatus(200);
   });
 });
