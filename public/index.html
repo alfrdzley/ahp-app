@@ -5,80 +5,103 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AHP App</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <h1>AHP Program Studi</h1>
-    <form id="program-form">
-      <input type="text" id="nama" placeholder="Nama Program Studi" required />
-      <input
-        type="number"
-        id="demand"
-        placeholder="Demand"
-        step="0.01"
-        required
-      />
-      <input type="number" id="cost" placeholder="Cost" step="0.01" required />
-      <input
-        type="number"
-        id="resources"
-        placeholder="Resources"
-        step="0.01"
-        required
-      />
-      <input
-        type="number"
-        id="academic_relevance"
-        placeholder="Academic Relevance"
-        step="0.01"
-        required
-      />
-      <input
-        type="number"
-        id="student_interest"
-        placeholder="Student Interest"
-        step="0.01"
-        required
-      />
-      <button type="submit">Add Program</button>
-    </form>
-    <div id="myChart-container">
-      <canvas id="myChart"></canvas>
-    </div>
-    <div class="program-list" id="program-list"></div>
+    <header>
+      <h1>AHP Program Studi</h1>
+    </header>
 
-    <!-- The Modal for Detail and Update -->
-    <div id="detailModal" class="modal">
-      <div class="modal-content">
-        <span class="close" id="closeDetailModal">&times;</span>
-        <h2>Detail Program Studi</h2>
-        <form id="update-form">
-          <input type="hidden" id="update-id" />
-          <label for="update-nama">Nama:</label>
-          <input type="text" id="update-nama" disabled />
-          <label for="update-demand">Demand:</label>
-          <input type="number" id="update-demand" step="0.01" required />
-          <label for="update-cost">Cost:</label>
-          <input type="number" id="update-cost" step="0.01" required />
-          <label for="update-resources">Resources:</label>
-          <input type="number" id="update-resources" step="0.01" required />
-          <label for="update-academic_relevance">Academic Relevance:</label>
+    <main>
+      <section id="form-section">
+        <form id="program-form">
+          <input
+            type="text"
+            id="nama"
+            placeholder="Nama Program Studi"
+            required
+          />
           <input
             type="number"
-            id="update-academic_relevance"
+            id="demand"
+            placeholder="Demand"
             step="0.01"
             required
           />
-          <label for="update-student_interest">Student Interest:</label>
           <input
             type="number"
-            id="update-student_interest"
+            id="cost"
+            placeholder="Cost"
             step="0.01"
             required
           />
-          <button type="submit">Update Program</button>
+          <input
+            type="number"
+            id="resources"
+            placeholder="Resources"
+            step="0.01"
+            required
+          />
+          <input
+            type="number"
+            id="academic_relevance"
+            placeholder="Academic Relevance"
+            step="0.01"
+            required
+          />
+          <input
+            type="number"
+            id="student_interest"
+            placeholder="Student Interest"
+            step="0.01"
+            required
+          />
+          <button type="submit">Add Program</button>
         </form>
-      </div>
-    </div>
+      </section>
+
+      <section id="chart-section">
+        <div id="myChart-container">
+          <canvas id="myChart"></canvas>
+        </div>
+      </section>
+
+      <section class="program-list" id="program-list"></section>
+
+      <!-- The Modal for Detail and Update -->
+      <section id="detail-section" class="hidden">
+        <div class="modal-content">
+          <button id="backButton">&larr; Back</button>
+          <h2>Detail Program Studi</h2>
+          <form id="update-form">
+            <input type="hidden" id="update-id" />
+            <label for="update-nama">Nama:</label>
+            <input type="text" id="update-nama" disabled />
+            <label for="update-demand">Demand:</label>
+            <input type="number" id="update-demand" step="0.01" required />
+            <label for="update-cost">Cost:</label>
+            <input type="number" id="update-cost" step="0.01" required />
+            <label for="update-resources">Resources:</label>
+            <input type="number" id="update-resources" step="0.01" required />
+            <label for="update-academic_relevance">Academic Relevance:</label>
+            <input
+              type="number"
+              id="update-academic_relevance"
+              step="0.01"
+              required
+            />
+            <label for="update-student_interest">Student Interest:</label>
+            <input
+              type="number"
+              id="update-student_interest"
+              step="0.01"
+              required
+            />
+            <button type="submit">Update Program</button>
+          </form>
+        </div>
+      </section>
+    </main>
 
     <script src="app.js"></script>
   </body>

@@ -60,13 +60,13 @@ app.post("/programs", (req, res) => {
   connection.query(
     query,
     [nama, demand, cost, resources, academic_relevance, student_interest],
-    (err, results) => {
+    (err) => {
       if (err) {
         console.error("Error inserting data:", err);
         res.status(500).send("Internal Server Error");
         return;
       }
-      res.json({ id: results.insertId });
+      res.sendStatus(200);
     }
   );
 });
@@ -94,7 +94,7 @@ app.put("/programs/:id", (req, res) => {
 
 app.delete("/programs/:id", (req, res) => {
   const { id } = req.params;
-  console.log(`Deleting program with ID: ${id}`); // Tambahkan logging ini
+  console.log(`Deleting program with ID: ${id}`);
   const query = "DELETE FROM program_studi WHERE id = ?";
   connection.query(query, [id], (err, results) => {
     if (err) {
@@ -105,6 +105,11 @@ app.delete("/programs/:id", (req, res) => {
     console.log(`Deleted ${results.affectedRows} row(s)`);
     res.sendStatus(200);
   });
+});
+
+// Handle requests to /program/detail
+app.get("/program/detail", (req, res) => {
+  res.sendFile(__dirname + "/public/index.html");
 });
 
 app.listen(port, () => {

@@ -163,8 +163,8 @@ function displayPrograms(programs) {
 
 async function viewDetails(id) {
   console.log(`Fetching details for program with ID: ${id}`);
-  const modal = document.getElementById("detailModal");
-  const closeModal = document.getElementById("closeDetailModal");
+  const detailSection = document.getElementById("detail-section");
+  const mainSection = document.querySelector("main");
 
   try {
     const response = await fetch(`/programs/${id}`);
@@ -189,21 +189,22 @@ async function viewDetails(id) {
     document.getElementById("update-student_interest").value =
       program.student_interest;
 
-    modal.style.display = "block";
-
-    closeModal.onclick = function () {
-      modal.style.display = "none";
-    };
-
-    window.onclick = function (event) {
-      if (event.target == modal) {
-        modal.style.display = "none";
-      }
-    };
+    detailSection.classList.remove("hidden");
+    mainSection.classList.add("hidden");
+    window.history.pushState({ id }, "Detail Program", `/program/detail`);
   } catch (error) {
     console.error(`Error fetching details for program ${id}:`, error);
   }
 }
+
+document.getElementById("backButton").addEventListener("click", () => {
+  const detailSection = document.getElementById("detail-section");
+  const mainSection = document.querySelector("main");
+
+  detailSection.classList.add("hidden");
+  mainSection.classList.remove("hidden");
+  window.history.pushState({}, "AHP App", "/");
+});
 
 document
   .getElementById("update-form")
@@ -250,6 +251,11 @@ document
         console.log("Program updated successfully");
         document.getElementById("detailModal").style.display = "none";
         loadPrograms();
+        const detailSection = document.getElementById("detail-section");
+        const mainSection = document.querySelector("main");
+        detailSection.classList.add("hidden");
+        mainSection.classList.remove("hidden");
+        window.history.pushState({}, "AHP App", "/");
       } else {
         console.error(
           "Failed to update program",
