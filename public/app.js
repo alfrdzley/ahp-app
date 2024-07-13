@@ -88,6 +88,9 @@ async function loadPrograms() {
     const maxScore = Math.max(...scores);
     const bestProgramIndex = scores.indexOf(maxScore);
     const bestProgramName = names[bestProgramIndex];
+    const maxScore = Math.max(...scores);
+    const bestProgramIndex = scores.indexOf(maxScore);
+    const bestProgramName = names[bestProgramIndex];
 
     console.log("Initializing Chart.js with data:", {
       names,

@@ -94,13 +94,20 @@ app.put("/programs/:nama", (req, res) => {
 app.delete("/programs/:nama", (req, res) => {
   const { nama } = req.params;
   const query = "DELETE FROM program_studi WHERE nama = ?";
+<<<<<<< HEAD
   connection.query(query, [nama], (err, results) => {
+=======
+  connection.query(query, [name], (err) => {
+>>>>>>> c1fc3bd3417412478e7367a2741e917c64d4e8f5
     if (err) {
       console.error("Error deleting data:", err);
       res.status(500).send("Internal Server Error");
       return;
     }
+<<<<<<< HEAD
     console.log(`Deleted ${results.affectedRows} row(s)`);
+=======
+>>>>>>> c1fc3bd3417412478e7367a2741e917c64d4e8f5
     res.sendStatus(200);
   });
 });
