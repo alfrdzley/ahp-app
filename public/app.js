@@ -147,16 +147,21 @@ async function loadPrograms() {
 }
 
 function displayPrograms(programs) {
-  const programList = document.getElementById("program-list");
+  const programList = document
+    .getElementById("program-list")
+    .querySelector(".space-y-4");
   programList.innerHTML = "";
   programs.forEach((program) => {
     const programItem = document.createElement("div");
-    programItem.className = "program-item";
+    programItem.className =
+      "program-item flex justify-between items-center p-4 border border-gray-300 rounded bg-white shadow-md";
     programItem.innerHTML = `
-      <span>${program.nama}</span>
-      <button onclick="viewDetails(${program.id})">Lihat Detail</button>
-      <button onclick="deleteProgram(${program.id})">Hapus</button>
-    `;
+    <span>${program.nama}</span>
+    <div class="space-x-2">
+      <button onclick="viewDetails(${program.id})" class="bg-blue-500 text-white px-4 py-2 rounded">Lihat Detail</button>
+      <button onclick="deleteProgram(${program.id})" class="bg-red-500 text-white px-4 py-2 rounded">Hapus</button>
+    </div>
+  `;
     programList.appendChild(programItem);
   });
 }
@@ -191,7 +196,11 @@ async function viewDetails(id) {
 
     detailSection.classList.remove("hidden");
     mainSection.classList.add("hidden");
-    window.history.pushState({ id }, "Detail Program", `/program/detail`);
+    window.history.pushState(
+      { id },
+      "Detail Program",
+      `/programs/detail/${id}`
+    );
   } catch (error) {
     console.error(`Error fetching details for program ${id}:`, error);
   }
@@ -249,7 +258,6 @@ document
 
       if (response.ok) {
         console.log("Program updated successfully");
-        document.getElementById("detailModal").style.display = "none";
         loadPrograms();
         const detailSection = document.getElementById("detail-section");
         const mainSection = document.querySelector("main");
