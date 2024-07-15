@@ -5,155 +5,194 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AHP App</title>
     <link
-      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      .overflow-scroll {
+        max-height: 300px;
+        overflow-y: auto;
+      }
+    </style>
   </head>
-  <body class="bg-gray-100">
-    <header class="bg-green-500 text-white p-4 text-center">
-      <h1 class="text-2xl font-bold">AHP Program Studi</h1>
+  <body class="bg-light">
+    <header class="bg-success text-white text-center">
+      <h1 class="">AHP Program Studi</h1>
     </header>
-    <main class="p-4">
-      <section id="form-section" class="mb-8">
-        <h2 class="text-xl font-bold mb-4">Add New Program</h2>
-        <form
-          id="program-form"
-          class="space-y-4 bg-white p-4 rounded shadow-md"
-        >
-          <input
-            type="text"
-            id="nama"
-            placeholder="Nama Program Studi"
-            required
-            class="w-full p-2 border border-gray-300 rounded"
-          />
-          <input
-            type="number"
-            id="demand"
-            placeholder="Demand"
-            step="0.01"
-            required
-            class="w-full p-2 border border-gray-300 rounded"
-          />
-          <input
-            type="number"
-            id="cost"
-            placeholder="Cost"
-            step="0.01"
-            required
-            class="w-full p-2 border border-gray-300 rounded"
-          />
-          <input
-            type="number"
-            id="resources"
-            placeholder="Resources"
-            step="0.01"
-            required
-            class="w-full p-2 border border-gray-300 rounded"
-          />
-          <input
-            type="number"
-            id="academic_relevance"
-            placeholder="Academic Relevance"
-            step="0.01"
-            required
-            class="w-full p-2 border border-gray-300 rounded"
-          />
-          <input
-            type="number"
-            id="student_interest"
-            placeholder="Student Interest"
-            step="0.01"
-            required
-            class="w-full p-2 border border-gray-300 rounded"
-          />
-          <button
-            type="submit"
-            class="w-full bg-green-500 text-white p-2 rounded"
-          >
-            Add Program
-          </button>
-        </form>
-      </section>
-
-      <section id="chart-section" class="mb-8">
-        <h2 class="text-xl font-bold mb-4">Program Scores</h2>
-        <div id="myChart-container" class="bg-white p-4 rounded shadow-md">
+    <main class="container mt-4">
+      <!-- Hero Section -->
+      <section id="hero-section" class="mb-4">
+        <h2 class="h3 mb-4 text-center">Program Scores</h2>
+        <div id="myChart-container" class="bg-white p-4 rounded shadow-sm">
           <canvas id="myChart"></canvas>
         </div>
       </section>
 
-      <section class="program-list" id="program-list">
-        <h2 class="text-xl font-bold mb-4">Programs List</h2>
-        <div class="space-y-4">
-          <!-- Program items will be dynamically added here -->
+      <!-- Form Section -->
+      <section id="form-section container" class="mb-4">
+        <!-- <h2 class="h3 mb-4">Add New Program</h2> -->
+        <div class="row">
+          <div class="col-md-6">
+            <form id="program-form" class="bg-white p-4 rounded shadow-sm">
+              <div class="mb-3">
+                <input
+                  type="text"
+                  id="nama"
+                  placeholder="Nama Program Studi"
+                  required
+                  class="form-control"
+                />
+              </div>
+              <div class="mb-3">
+                <input
+                  type="number"
+                  id="demand"
+                  placeholder="Demand"
+                  step="0.01"
+                  required
+                  class="form-control"
+                />
+              </div>
+              <div class="mb-3">
+                <input
+                  type="number"
+                  id="cost"
+                  placeholder="Cost"
+                  step="0.01"
+                  required
+                  class="form-control"
+                />
+              </div>
+              <div class="mb-3">
+                <input
+                  type="number"
+                  id="resources"
+                  placeholder="Resources"
+                  step="0.01"
+                  required
+                  class="form-control"
+                />
+              </div>
+              <div class="mb-3">
+                <input
+                  type="number"
+                  id="academic_relevance"
+                  placeholder="Academic Relevance"
+                  step="0.01"
+                  required
+                  class="form-control"
+                />
+              </div>
+              <div class="mb-3">
+                <input
+                  type="number"
+                  id="student_interest"
+                  placeholder="Student Interest"
+                  step="0.01"
+                  required
+                  class="form-control"
+                />
+              </div>
+              <div class="d-grid">
+                <button type="submit" class="btn btn-success">
+                  Add Program
+                </button>
+              </div>
+            </form>
+          </div>
+          <div class="col-md-6">
+            <!-- <h2 class="h3 mb-4">Programs List</h2> -->
+            <div class="list-group" id="program-list">
+              <!-- Program items will be dynamically added here -->
+            </div>
+          </div>
         </div>
       </section>
 
-      <section id="detail-section" class="hidden">
-        <div class="modal-content bg-white p-4 rounded shadow-md">
-          <button id="backButton" class="text-blue-500">&larr; Back</button>
-          <h2 class="text-xl font-bold mb-4">Detail Program Studi</h2>
-          <form id="update-form" class="space-y-4">
+      <!-- Detail Section -->
+      <section id="detail-section" class="mb-4" style="display: none">
+        <div class="bg-white p-4 rounded shadow-sm overflow-scroll">
+          <button id="backButton" class="btn btn-link mb-4">&larr; Back</button>
+          <h2 class="h3 mb-4">Detail Program Studi</h2>
+          <form id="update-form" class="row g-3">
             <input type="hidden" id="update-id" />
-            <label for="update-nama">Nama:</label>
-            <input
-              type="text"
-              id="update-nama"
-              disabled
-              class="w-full p-2 border border-gray-300 rounded"
-            />
-            <label for="update-demand">Demand:</label>
-            <input
-              type="number"
-              id="update-demand"
-              step="0.01"
-              required
-              class="w-full p-2 border border-gray-300 rounded"
-            />
-            <label for="update-cost">Cost:</label>
-            <input
-              type="number"
-              id="update-cost"
-              step="0.01"
-              required
-              class="w-full p-2 border border-gray-300 rounded"
-            />
-            <label for="update-resources">Resources:</label>
-            <input
-              type="number"
-              id="update-resources"
-              step="0.01"
-              required
-              class="w-full p-2 border border-gray-300 rounded"
-            />
-            <label for="update-academic_relevance">Academic Relevance:</label>
-            <input
-              type="number"
-              id="update-academic_relevance"
-              step="0.01"
-              required
-              class="w-full p-2 border border-gray-300 rounded"
-            />
-            <label for="update-student_interest">Student Interest:</label>
-            <input
-              type="number"
-              id="update-student_interest"
-              step="0.01"
-              required
-              class="w-full p-2 border border-gray-300 rounded"
-            />
-            <button
-              type="submit"
-              class="w-full bg-green-500 text-white p-2 rounded"
-            >
-              Update Program
-            </button>
+            <div class="col-md-6">
+              <label for="update-nama" class="form-label">Nama:</label>
+              <input
+                type="text"
+                id="update-nama"
+                disabled
+                class="form-control"
+              />
+            </div>
+            <div class="col-md-6">
+              <label for="update-demand" class="form-label">Demand:</label>
+              <input
+                type="number"
+                id="update-demand"
+                step="0.01"
+                required
+                class="form-control"
+              />
+            </div>
+            <div class="col-md-6">
+              <label for="update-cost" class="form-label">Cost:</label>
+              <input
+                type="number"
+                id="update-cost"
+                step="0.01"
+                required
+                class="form-control"
+              />
+            </div>
+            <div class="col-md-6">
+              <label for="update-resources" class="form-label"
+                >Resources:</label
+              >
+              <input
+                type="number"
+                id="update-resources"
+                step="0.01"
+                required
+                class="form-control"
+              />
+            </div>
+            <div class="col-md-6">
+              <label for="update-academic_relevance" class="form-label"
+                >Academic Relevance:</label
+              >
+              <input
+                type="number"
+                id="update-academic_relevance"
+                step="0.01"
+                required
+                class="form-control"
+              />
+            </div>
+            <div class="col-md-6">
+              <label for="update-student_interest" class="form-label"
+                >Student Interest:</label
+              >
+              <input
+                type="number"
+                id="update-student_interest"
+                step="0.01"
+                required
+                class="form-control"
+              />
+            </div>
+            <div class="col-12">
+              <button type="submit" class="btn btn-success w-100">
+                Update Program
+              </button>
+            </div>
           </form>
         </div>
       </section>
     </main>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
     <script src="app.js"></script>
   </body>
 </html>

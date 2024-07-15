@@ -142,26 +142,24 @@ async function loadPrograms() {
     });
     console.log("Chart.js instance created");
   } catch (error) {
-    console.error("Error loading programs:", error);
+    console.error("Errorloading programs:", error);
   }
 }
 
 function displayPrograms(programs) {
-  const programList = document
-    .getElementById("program-list")
-    .querySelector(".space-y-4");
+  const programList = document.getElementById("program-list");
   programList.innerHTML = "";
   programs.forEach((program) => {
     const programItem = document.createElement("div");
     programItem.className =
-      "program-item flex justify-between items-center p-4 border border-gray-300 rounded bg-white shadow-md";
+      "list-group-item d-flex justify-content-between align-items-center";
     programItem.innerHTML = `
-    <span>${program.nama}</span>
-    <div class="space-x-2">
-      <button onclick="viewDetails(${program.id})" class="bg-blue-500 text-white px-4 py-2 rounded">Lihat Detail</button>
-      <button onclick="deleteProgram(${program.id})" class="bg-red-500 text-white px-4 py-2 rounded">Hapus</button>
-    </div>
-  `;
+      <span>${program.nama}</span>
+      <div class="btn-group">
+        <button onclick="viewDetails(${program.id})" class="btn btn-primary">Lihat Detail</button>
+        <button onclick="deleteProgram(${program.id})" class="btn btn-danger">Hapus</button>
+      </div>
+    `;
     programList.appendChild(programItem);
   });
 }
@@ -194,8 +192,8 @@ async function viewDetails(id) {
     document.getElementById("update-student_interest").value =
       program.student_interest;
 
-    detailSection.classList.remove("hidden");
-    mainSection.classList.add("hidden");
+    detailSection.style.display = "block";
+    mainSection.style.display = "none";
     window.history.pushState(
       { id },
       "Detail Program",
@@ -210,8 +208,8 @@ document.getElementById("backButton").addEventListener("click", () => {
   const detailSection = document.getElementById("detail-section");
   const mainSection = document.querySelector("main");
 
-  detailSection.classList.add("hidden");
-  mainSection.classList.remove("hidden");
+  detailSection.style.display = "none";
+  mainSection.style.display = "block";
   window.history.pushState({}, "AHP App", "/");
 });
 
@@ -261,8 +259,8 @@ document
         loadPrograms();
         const detailSection = document.getElementById("detail-section");
         const mainSection = document.querySelector("main");
-        detailSection.classList.add("hidden");
-        mainSection.classList.remove("hidden");
+        detailSection.style.display = "none";
+        mainSection.style.display = "block";
         window.history.pushState({}, "AHP App", "/");
       } else {
         console.error(
