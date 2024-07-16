@@ -67,7 +67,7 @@ async function loadPrograms() {
     }
 
     const programs = await response.json();
-    console.log("Programs loaded:", programs);
+    // console.log("Programs loaded:", programs);
 
     displayPrograms(programs);
 
@@ -84,17 +84,17 @@ async function loadPrograms() {
       return values.reduce((acc, val, i) => acc + val * weights[i], 0);
     });
 
-    console.log("Scores:", scores);
+    // console.log("Scores:", scores);
 
     const maxScore = Math.max(...scores);
     const bestProgramIndex = scores.indexOf(maxScore);
     const bestProgramName = names[bestProgramIndex];
 
-    console.log("Initializing Chart.js with data:", {
-      names,
-      scores,
-      bestProgramName,
-    });
+    // console.log("Initializing Chart.js with data:", {
+    //   names,
+    //   scores,
+    //   bestProgramName,
+    // });
 
     const canvas = document.getElementById("myChart");
     if (!canvas) {
@@ -108,7 +108,7 @@ async function loadPrograms() {
       return;
     }
 
-    console.log("Creating Chart.js instance");
+    // console.log("Creating Chart.js instance");
     if (window.myChart instanceof Chart) {
       window.myChart.destroy();
     }
