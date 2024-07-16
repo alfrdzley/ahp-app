@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const mysql = require("mysql");
+const path = require("path");
 const app = express();
 const port = 3000;
 
@@ -17,8 +18,12 @@ connection.connect((err) => {
 });
 
 app.use(bodyParser.json());
-app.use(express.static("public"));
+app.use(express.static(path.join(__dirname, "public")));
 
+// Set EJS as templating engine
+app.set("view engine", "ejs");
+
+// Routes
 app.get("/programs", (req, res) => {
   connection.query("SELECT * FROM program_studi", (err, results) => {
     if (err) {
@@ -39,6 +44,10 @@ app.get("/programs/:id", (req, res) => {
       if (err) {
         console.error("Error fetching data:", err);
         res.status(500).send("Internal Server Error");
+        return;
+      }
+      if (results.length === 0) {
+        res.status(404).send("Program not found");
         return;
       }
       res.json(results[0]);
@@ -107,9 +116,10 @@ app.delete("/programs/:id", (req, res) => {
   });
 });
 
-// Handle requests to /program/detail
-app.get("/program/detail", (req, res) => {
-  res.sendFile(__dirname + "/public/index.html");
+// Rute untuk menangani permintaan detail program dan mengirim file HTML
+app.get("/programs/detail/:id", (req, res) => {
+  const { id } = req.params;
+  res.render("detail", { programId: id });
 });
 
 app.listen(port, () => {

@@ -41,6 +41,7 @@ document
       if (response.ok) {
         console.log("Program added successfully");
         loadPrograms();
+        document.getElementById("program-form").reset();
       } else {
         console.error(
           "Failed to add program",
@@ -121,7 +122,7 @@ async function loadPrograms() {
             label: "Skor Akhir",
             data: scores,
             backgroundColor: scores.map((score) =>
-              score === maxScore ? "orange" : "skyblue"
+              score === maxScore ? "red" : "skyblue"
             ),
           },
         ],
@@ -142,7 +143,7 @@ async function loadPrograms() {
     });
     console.log("Chart.js instance created");
   } catch (error) {
-    console.error("Errorloading programs:", error);
+    console.error("Error loading programs:", error);
   }
 }
 
@@ -154,7 +155,10 @@ function displayPrograms(programs) {
     programItem.className =
       "list-group-item d-flex justify-content-between align-items-center";
     programItem.innerHTML = `
-      <span>${program.nama}</span>
+      <div>
+        <h5 class="mb-1">${program.nama}</h5>
+        
+      </div>
       <div class="btn-group">
         <button onclick="viewDetails(${program.id})" class="btn btn-primary">Lihat Detail</button>
         <button onclick="deleteProgram(${program.id})" class="btn btn-danger">Hapus</button>
@@ -166,113 +170,12 @@ function displayPrograms(programs) {
 
 async function viewDetails(id) {
   console.log(`Fetching details for program with ID: ${id}`);
-  const detailSection = document.getElementById("detail-section");
-  const mainSection = document.querySelector("main");
-
   try {
-    const response = await fetch(`/programs/${id}`);
-    if (!response.ok) {
-      console.error(
-        `Failed to fetch details for program ${id}`,
-        response.status,
-        response.statusText
-      );
-      return;
-    }
-    const program = await response.json();
-    console.log(`Details fetched for program ${id}:`, program);
-
-    document.getElementById("update-id").value = program.id;
-    document.getElementById("update-nama").value = program.nama;
-    document.getElementById("update-demand").value = program.demand;
-    document.getElementById("update-cost").value = program.cost;
-    document.getElementById("update-resources").value = program.resources;
-    document.getElementById("update-academic_relevance").value =
-      program.academic_relevance;
-    document.getElementById("update-student_interest").value =
-      program.student_interest;
-
-    detailSection.style.display = "block";
-    mainSection.style.display = "none";
-    window.history.pushState(
-      { id },
-      "Detail Program",
-      `/programs/detail/${id}`
-    );
+    window.location.href = `/programs/detail/${id}`;
   } catch (error) {
     console.error(`Error fetching details for program ${id}:`, error);
   }
 }
-
-document.getElementById("backButton").addEventListener("click", () => {
-  const detailSection = document.getElementById("detail-section");
-  const mainSection = document.querySelector("main");
-
-  detailSection.style.display = "none";
-  mainSection.style.display = "block";
-  window.history.pushState({}, "AHP App", "/");
-});
-
-document
-  .getElementById("update-form")
-  .addEventListener("submit", async function (e) {
-    e.preventDefault();
-    const id = document.getElementById("update-id").value;
-    const demand = parseFloat(document.getElementById("update-demand").value);
-    const cost = parseFloat(document.getElementById("update-cost").value);
-    const resources = parseFloat(
-      document.getElementById("update-resources").value
-    );
-    const academic_relevance = parseFloat(
-      document.getElementById("update-academic_relevance").value
-    );
-    const student_interest = parseFloat(
-      document.getElementById("update-student_interest").value
-    );
-
-    console.log("Updating program:", {
-      id,
-      demand,
-      cost,
-      resources,
-      academic_relevance,
-      student_interest,
-    });
-
-    try {
-      const response = await fetch(`/programs/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          demand,
-          cost,
-          resources,
-          academic_relevance,
-          student_interest,
-        }),
-      });
-
-      if (response.ok) {
-        console.log("Program updated successfully");
-        loadPrograms();
-        const detailSection = document.getElementById("detail-section");
-        const mainSection = document.querySelector("main");
-        detailSection.style.display = "none";
-        mainSection.style.display = "block";
-        window.history.pushState({}, "AHP App", "/");
-      } else {
-        console.error(
-          "Failed to update program",
-          response.status,
-          response.statusText
-        );
-      }
-    } catch (error) {
-      console.error("Error updating program:", error);
-    }
-  });
 
 async function deleteProgram(id) {
   console.log(`Preparing to delete program with ID: ${id}`);
