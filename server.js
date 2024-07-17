@@ -3,7 +3,7 @@ const bodyParser = require("body-parser");
 const mysql = require("mysql");
 const path = require("path");
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 const connection = mysql.createConnection({
   host: "localhost",
@@ -22,6 +22,25 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // Set EJS as templating engine
 app.set("view engine", "ejs");
+
+// Calculate final score
+function calculateScore(
+  demand,
+  cost,
+  resources,
+  academic_relevance,
+  student_interest
+) {
+  const weights = [0.3, 0.2, 0.2, 0.15, 0.15];
+  const values = [
+    demand,
+    cost,
+    resources,
+    academic_relevance,
+    student_interest,
+  ];
+  return values.reduce((acc, val, i) => acc + val * weights[i], 0);
+}
 
 // Routes
 app.get("/programs", (req, res) => {
@@ -64,11 +83,26 @@ app.post("/programs", (req, res) => {
     academic_relevance,
     student_interest,
   } = req.body;
+  const skor_akhir = calculateScore(
+    demand,
+    cost,
+    resources,
+    academic_relevance,
+    student_interest
+  );
   const query =
-    "INSERT INTO program_studi (nama, demand, cost, resources, academic_relevance, student_interest) VALUES (?, ?, ?, ?, ?, ?)";
+    "INSERT INTO program_studi (nama, demand, cost, resources, academic_relevance, student_interest, skor_akhir) VALUES (?, ?, ?, ?, ?, ?, ?)";
   connection.query(
     query,
-    [nama, demand, cost, resources, academic_relevance, student_interest],
+    [
+      nama,
+      demand,
+      cost,
+      resources,
+      academic_relevance,
+      student_interest,
+      skor_akhir,
+    ],
     (err) => {
       if (err) {
         console.error("Error inserting data:", err);
@@ -82,13 +116,35 @@ app.post("/programs", (req, res) => {
 
 app.put("/programs/:id", (req, res) => {
   const { id } = req.params;
-  const { demand, cost, resources, academic_relevance, student_interest } =
-    req.body;
+  const {
+    nama,
+    demand,
+    cost,
+    resources,
+    academic_relevance,
+    student_interest,
+  } = req.body;
+  const skor_akhir = calculateScore(
+    demand,
+    cost,
+    resources,
+    academic_relevance,
+    student_interest
+  );
   const query =
-    "UPDATE program_studi SET demand = ?, cost = ?, resources = ?, academic_relevance = ?, student_interest = ? WHERE id = ?";
+    "UPDATE program_studi SET nama = ?, demand = ?, cost = ?, resources = ?, academic_relevance = ?, student_interest = ?, skor_akhir = ? WHERE id = ?";
   connection.query(
     query,
-    [demand, cost, resources, academic_relevance, student_interest, id],
+    [
+      nama,
+      demand,
+      cost,
+      resources,
+      academic_relevance,
+      student_interest,
+      skor_akhir,
+      id,
+    ],
     (err, results) => {
       if (err) {
         console.error("Error updating data:", err);
@@ -120,6 +176,28 @@ app.delete("/programs/:id", (req, res) => {
 app.get("/programs/detail/:id", (req, res) => {
   const { id } = req.params;
   res.render("detail", { programId: id });
+});
+
+// Rute untuk menampilkan data tabel yang ditransposkan
+app.get("/programs/transpose/:id", (req, res) => {
+  const { id } = req.params;
+  connection.query(
+    "SELECT * FROM program_studi WHERE id = ?",
+    [id],
+    (err, results) => {
+      if (err) {
+        console.error("Error fetching data:", err);
+        res.status(500).send("Internal Server Error");
+        return;
+      }
+      if (results.length === 0) {
+        res.status(404).send("Program not found");
+        return;
+      }
+      const program = results[0];
+      res.render("transpose", { program });
+    }
+  );
 });
 
 app.listen(port, () => {
