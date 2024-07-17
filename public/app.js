@@ -41,36 +41,42 @@ async function loadPrograms() {
     const programs = await response.json();
     console.log('Programs loaded:', programs);
 
-    displayPrograms(programs);
-
-    const names = programs.map(p => p.nama);
-    const scores = programs.map(p => {
-      const weights = [0.3, 0.2, 0.2, 0.15, 0.15];
-      const values = [p.demand, p.cost, p.resources, p.academic_relevance, p.student_interest];
-      return values.reduce((acc, val, i) => acc + (val * weights[i]), 0);
+    // Initialize DataTables
+    $(document).ready(function() {
+      $('#program-list').DataTable({
+        data: programs,
+        columns: [
+          { data: 'nama' },
+          { data: 'demand' },
+          { data: 'cost' },
+          { data: 'resources' },
+          { data: 'academic_relevance' },
+          { data: 'student_interest' },
+          { data: 'skor_akhir' },
+          {
+            data: null,
+            render: function(data, type, row) {
+              return `
+                <button onclick="viewDetails(${data.id})" class="btn btn-primary">Lihat Detail</button>
+                <button onclick="deleteProgram(${data.id})" class="btn btn-danger">Hapus</button>
+              `;
+            }
+          }
+        ],
+        destroy: true // Allow re-initialization
+      });
     });
 
-    console.log('Scores:', scores);
+    const names = programs.map(p => p.nama);
+    const scores = programs.map(p => p.skor_akhir);
 
     const maxScore = Math.max(...scores);
     const bestProgramIndex = scores.indexOf(maxScore);
     const bestProgramName = names[bestProgramIndex];
 
-    console.log('Initializing Chart.js with data:', { names, scores, bestProgramName });
-
     const canvas = document.getElementById('myChart');
-    if (!canvas) {
-      console.error('Canvas element not found');
-      return;
-    }
-
     const ctx = canvas.getContext('2d');
-    if (!ctx) {
-      console.error('Failed to get canvas context');
-      return;
-    }
 
-    console.log('Creating Chart.js instance');
     if (window.myChart instanceof Chart) {
       window.myChart.destroy();
     }
@@ -99,38 +105,16 @@ async function loadPrograms() {
         }
       }
     });
-    console.log('Chart.js instance created');
   } catch (error) {
     console.error('Error loading programs:', error);
   }
 }
 
-function displayPrograms(programs) {
-  const programList = document.getElementById('program-list');
-  programList.innerHTML = '';
-  programs.forEach(program => {
-    const programItem = document.createElement('div');
-    programItem.className = 'list-group-item d-flex justify-content-between align-items-center';
-    programItem.innerHTML = `
-      <div>
-        <h5 class="mb-1">${program.nama}</h5>
-      </div>
-      <div class="btn-group">
-        <button onclick="viewDetails(${program.id})" class="btn btn-primary">Lihat Detail</button>
-        <button onclick="deleteProgram(${program.id})" class="btn btn-danger">Hapus</button>
-      </div>
-    `;
-    programList.appendChild(programItem);
-  });
-}
-
-async function viewDetails(id) {
-  console.log(`Fetching details for program with ID: ${id}`);
-  try {
-    window.location.href = `/programs/transpose/${id}`;
-  } catch (error) {
-    console.error(`Error fetching details for program ${id}:`, error);
-  }
+function showModal(message) {
+  const modalBody = document.getElementById('modal-body-text');
+  modalBody.textContent = message;
+  const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+  confirmationModal.show();
 }
 
 async function deleteProgram(id) {
@@ -152,12 +136,52 @@ async function deleteProgram(id) {
   }
 }
 
-function showModal(message) {
-  const modalBody = document.getElementById('modal-body-text');
-  modalBody.textContent = message;
-  const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
-  confirmationModal.show();
+async function viewDetails(id) {
+  console.log(`Fetching details for program with ID: ${id}`);
+  try {
+    window.location.href = `/programs/transpose/${id}`;
+  } catch (error) {
+    console.error(`Error fetching details for program ${id}:`, error);
+  }
 }
+
+// Function to export table data to CSV
+function exportTableToCSV(filename) {
+  var csv = [];
+  var rows = document.querySelectorAll("#program-list tr");
+
+  for (var i = 0; i < rows.length; i++) {
+    var row = [], cols = rows[i].querySelectorAll("td, th");
+
+    for (var j = 0; j < cols.length; j++)
+      row.push(cols[j].innerText);
+
+    csv.push(row.join(","));
+  }
+
+  // Download CSV
+  var csvFile = new Blob([csv.join("\n")], { type: "text/csv" });
+  var downloadLink = document.createElement("a");
+  downloadLink.download = filename;
+  downloadLink.href = window.URL.createObjectURL(csvFile);
+  downloadLink.style.display = "none";
+  document.body.appendChild(downloadLink);
+  downloadLink.click();
+  document.body.removeChild(downloadLink);
+}
+
+// Event listener for export button
+document.getElementById('export-csv').addEventListener('click', function() {
+  const exportModal = new bootstrap.Modal(document.getElementById('exportConfirmationModal'));
+  exportModal.show();
+});
+
+// Confirm export
+document.getElementById('confirm-export').addEventListener('click', function() {
+  exportTableToCSV('programs.csv');
+  const exportModal = new bootstrap.Modal(document.getElementById('exportConfirmationModal'));
+  exportModal.hide();
+});
 
 loadPrograms();
 
