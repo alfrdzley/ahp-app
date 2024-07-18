@@ -4,6 +4,8 @@ const mysql = require("mysql");
 const path = require("path");
 const app = express();
 const port = process.env.PORT || 3000;
+const fs = require("fs");
+const { Parser } = require("json2csv");
 
 const connection = mysql.createConnection({
   host: "localhost",
@@ -198,6 +200,34 @@ app.get("/programs/transpose/:id", (req, res) => {
       res.render("transpose", { program });
     }
   );
+});
+
+// Rute untuk ekspor data ke CSV
+app.get("/export", (req, res) => {
+  connection.query("SELECT * FROM program_studi", (err, results) => {
+    if (err) {
+      console.error("Error fetching data:", err);
+      res.status(500).send("Internal Server Error");
+      return;
+    }
+
+    const fields = [
+      "id",
+      "nama",
+      "demand",
+      "cost",
+      "resources",
+      "academic_relevance",
+      "student_interest",
+      "skor_akhir",
+    ];
+    const json2csvParser = new Parser({ fields });
+    const csv = json2csvParser.parse(results);
+
+    res.header("Content-Type", "text/csv");
+    res.attachment("programs.csv");
+    res.send(csv);
+  });
 });
 
 app.listen(port, () => {
