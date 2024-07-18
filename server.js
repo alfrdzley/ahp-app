@@ -10,7 +10,7 @@ const { Parser } = require("json2csv");
 const app = express();
 const port = process.env.PORT || 3000;
 
-const upload = multer({ dest: "uploads/" });
+const upload = multer({ dest: 'uploads/' });
 
 const connection = mysql.createConnection({
   host: "localhost",
@@ -25,28 +25,16 @@ connection.connect((err) => {
 });
 
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Set EJS as templating engine
-app.set("view engine", "ejs");
+app.set('view engine', 'ejs');
 
 // Calculate final score
-function calculateScore(
-  demand,
-  cost,
-  resources,
-  academic_relevance,
-  student_interest
-) {
+function calculateScore(demand, cost, resources, academic_relevance, student_interest) {
   const weights = [0.3, 0.2, 0.2, 0.15, 0.15];
-  const values = [
-    demand,
-    cost,
-    resources,
-    academic_relevance,
-    student_interest,
-  ];
-  return values.reduce((acc, val, i) => acc + val * weights[i], 0);
+  const values = [demand, cost, resources, academic_relevance, student_interest];
+  return values.reduce((acc, val, i) => acc + (val * weights[i]), 0);
 }
 
 // Routes
@@ -90,26 +78,12 @@ app.post("/programs", (req, res) => {
     academic_relevance,
     student_interest,
   } = req.body;
-  const skor_akhir = calculateScore(
-    parseFloat(demand),
-    parseFloat(cost),
-    parseFloat(resources),
-    parseFloat(academic_relevance),
-    parseFloat(student_interest)
-  );
+  const skor_akhir = calculateScore(parseFloat(demand), parseFloat(cost), parseFloat(resources), parseFloat(academic_relevance), parseFloat(student_interest));
   const query =
     "INSERT INTO program_studi (nama, demand, cost, resources, academic_relevance, student_interest, skor_akhir) VALUES (?, ?, ?, ?, ?, ?, ?)";
   connection.query(
     query,
-    [
-      nama,
-      demand,
-      cost,
-      resources,
-      academic_relevance,
-      student_interest,
-      skor_akhir,
-    ],
+    [nama, demand, cost, resources, academic_relevance, student_interest, skor_akhir],
     (err) => {
       if (err) {
         console.error("Error inserting data:", err);
@@ -123,35 +97,14 @@ app.post("/programs", (req, res) => {
 
 app.put("/programs/:id", (req, res) => {
   const { id } = req.params;
-  const {
-    nama,
-    demand,
-    cost,
-    resources,
-    academic_relevance,
-    student_interest,
-  } = req.body;
-  const skor_akhir = calculateScore(
-    parseFloat(demand),
-    parseFloat(cost),
-    parseFloat(resources),
-    parseFloat(academic_relevance),
-    parseFloat(student_interest)
-  );
+  const { nama, demand, cost, resources, academic_relevance, student_interest } =
+    req.body;
+  const skor_akhir = calculateScore(parseFloat(demand), parseFloat(cost), parseFloat(resources), parseFloat(academic_relevance), parseFloat(student_interest));
   const query =
     "UPDATE program_studi SET nama = ?, demand = ?, cost = ?, resources = ?, academic_relevance = ?, student_interest = ?, skor_akhir = ? WHERE id = ?";
   connection.query(
     query,
-    [
-      nama,
-      demand,
-      cost,
-      resources,
-      academic_relevance,
-      student_interest,
-      skor_akhir,
-      id,
-    ],
+    [nama, demand, cost, resources, academic_relevance, student_interest, skor_akhir, id],
     (err, results) => {
       if (err) {
         console.error("Error updating data:", err);
@@ -182,7 +135,7 @@ app.delete("/programs/:id", (req, res) => {
 // Rute untuk menangani permintaan detail program dan mengirim file HTML
 app.get("/programs/detail/:id", (req, res) => {
   const { id } = req.params;
-  res.render("detail", { programId: id });
+  res.render('detail', { programId: id });
 });
 
 // Rute untuk menampilkan data tabel yang ditransposkan
@@ -202,7 +155,7 @@ app.get("/programs/transpose/:id", (req, res) => {
         return;
       }
       const program = results[0];
-      res.render("transpose", { program });
+      res.render('transpose', { program });
     }
   );
 });
@@ -216,16 +169,7 @@ app.get("/export", (req, res) => {
       return;
     }
 
-    const fields = [
-      "id",
-      "nama",
-      "demand",
-      "cost",
-      "resources",
-      "academic_relevance",
-      "student_interest",
-      "skor_akhir",
-    ];
+    const fields = ["id", "nama", "demand", "cost", "resources", "academic_relevance", "student_interest", "skor_akhir"];
     const json2csvParser = new Parser({ fields });
     const csv = json2csvParser.parse(results);
 
@@ -236,12 +180,12 @@ app.get("/export", (req, res) => {
 });
 
 // Rute untuk mengunggah dan memproses CSV
-app.post("/upload", upload.single("csvfile"), (req, res) => {
+app.post('/upload', upload.single('csvfile'), (req, res) => {
   const results = [];
   fs.createReadStream(req.file.path)
     .pipe(csv())
-    .on("data", (data) => results.push(data))
-    .on("end", () => {
+    .on('data', (data) => results.push(data))
+    .on('end', () => {
       let errors = false;
       results.forEach((row, index) => {
         const {
@@ -250,55 +194,37 @@ app.post("/upload", upload.single("csvfile"), (req, res) => {
           cost,
           resources,
           academic_relevance,
-          student_interest,
+          student_interest
         } = row;
-        if (
-          !nama ||
-          isNaN(parseFloat(demand)) ||
-          isNaN(parseFloat(cost)) ||
-          isNaN(parseFloat(resources)) ||
-          isNaN(parseFloat(academic_relevance)) ||
-          isNaN(parseFloat(student_interest))
-        ) {
+        if (!nama || isNaN(parseFloat(demand)) || isNaN(parseFloat(cost)) || isNaN(parseFloat(resources)) || isNaN(parseFloat(academic_relevance)) || isNaN(parseFloat(student_interest))) {
           errors = true;
           console.error(`Error parsing row ${index + 1}: invalid data`);
           return;
         }
-        const skor_akhir = calculateScore(
-          parseFloat(demand),
-          parseFloat(cost),
-          parseFloat(resources),
-          parseFloat(academic_relevance),
-          parseFloat(student_interest)
-        );
-        const query =
-          "INSERT INTO program_studi (nama, demand, cost, resources, academic_relevance, student_interest, skor_akhir) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        connection.query(
-          query,
-          [
-            nama,
-            demand,
-            cost,
-            resources,
-            academic_relevance,
-            student_interest,
-            skor_akhir,
-          ],
-          (err) => {
-            if (err) {
-              console.error("Error inserting data:", err);
-              errors = true;
-            }
+        const skor_akhir = calculateScore(parseFloat(demand), parseFloat(cost), parseFloat(resources), parseFloat(academic_relevance), parseFloat(student_interest));
+        const checkQuery = "SELECT * FROM program_studi WHERE nama = ?";
+        connection.query(checkQuery, [nama], (checkErr, checkResults) => {
+          if (checkErr) {
+            console.error("Error checking data:", checkErr);
+            errors = true;
+            return;
           }
-        );
+          if (checkResults.length === 0) {
+            const query = "INSERT INTO program_studi (nama, demand, cost, resources, academic_relevance, student_interest, skor_akhir) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            connection.query(query, [nama, demand, cost, resources, academic_relevance, student_interest, skor_akhir], (insertErr) => {
+              if (insertErr) {
+                console.error("Error inserting data:", insertErr);
+                errors = true;
+              }
+            });
+          } else {
+            console.log(`Data with name "${nama}" already exists. Skipping...`);
+          }
+        });
       });
       fs.unlinkSync(req.file.path); // Delete the file after processing
       if (errors) {
-        res
-          .status(500)
-          .send(
-            "Errors occurred while processing the CSV file. Check server logs for details."
-          );
+        res.status(500).send("Errors occurred while processing the CSV file. Check server logs for details.");
       } else {
         res.sendStatus(200);
       }
