@@ -27,6 +27,19 @@
         <canvas id="myChart" width="400" height="150"></canvas>
       </section>
       <section class="mb-4">
+        <h2 class="h3">Import CSV</h2>
+        <form id="csv-form" enctype="multipart/form-data">
+          <input
+            type="file"
+            id="csv-file"
+            class="form-control"
+            accept=".csv"
+            required
+          />
+          <button type="submit" class="btn btn-success mt-3">Import CSV</button>
+        </form>
+      </section>
+      <section class="mb-4">
         <h2 class="h3">Add New Program</h2>
         <form id="program-form" class="row g-3">
           <div class="col-md-6">

@@ -2,10 +2,15 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const mysql = require("mysql");
 const path = require("path");
-const app = express();
-const port = process.env.PORT || 3000;
+const multer = require("multer");
+const csv = require("csv-parser");
 const fs = require("fs");
 const { Parser } = require("json2csv");
+
+const app = express();
+const port = process.env.PORT || 3000;
+
+const upload = multer({ dest: "uploads/" });
 
 const connection = mysql.createConnection({
   host: "localhost",
@@ -86,11 +91,11 @@ app.post("/programs", (req, res) => {
     student_interest,
   } = req.body;
   const skor_akhir = calculateScore(
-    demand,
-    cost,
-    resources,
-    academic_relevance,
-    student_interest
+    parseFloat(demand),
+    parseFloat(cost),
+    parseFloat(resources),
+    parseFloat(academic_relevance),
+    parseFloat(student_interest)
   );
   const query =
     "INSERT INTO program_studi (nama, demand, cost, resources, academic_relevance, student_interest, skor_akhir) VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -127,11 +132,11 @@ app.put("/programs/:id", (req, res) => {
     student_interest,
   } = req.body;
   const skor_akhir = calculateScore(
-    demand,
-    cost,
-    resources,
-    academic_relevance,
-    student_interest
+    parseFloat(demand),
+    parseFloat(cost),
+    parseFloat(resources),
+    parseFloat(academic_relevance),
+    parseFloat(student_interest)
   );
   const query =
     "UPDATE program_studi SET nama = ?, demand = ?, cost = ?, resources = ?, academic_relevance = ?, student_interest = ?, skor_akhir = ? WHERE id = ?";
@@ -228,6 +233,76 @@ app.get("/export", (req, res) => {
     res.attachment("programs.csv");
     res.send(csv);
   });
+});
+
+// Rute untuk mengunggah dan memproses CSV
+app.post("/upload", upload.single("csvfile"), (req, res) => {
+  const results = [];
+  fs.createReadStream(req.file.path)
+    .pipe(csv())
+    .on("data", (data) => results.push(data))
+    .on("end", () => {
+      let errors = false;
+      results.forEach((row, index) => {
+        const {
+          nama,
+          demand,
+          cost,
+          resources,
+          academic_relevance,
+          student_interest,
+        } = row;
+        if (
+          !nama ||
+          isNaN(parseFloat(demand)) ||
+          isNaN(parseFloat(cost)) ||
+          isNaN(parseFloat(resources)) ||
+          isNaN(parseFloat(academic_relevance)) ||
+          isNaN(parseFloat(student_interest))
+        ) {
+          errors = true;
+          console.error(`Error parsing row ${index + 1}: invalid data`);
+          return;
+        }
+        const skor_akhir = calculateScore(
+          parseFloat(demand),
+          parseFloat(cost),
+          parseFloat(resources),
+          parseFloat(academic_relevance),
+          parseFloat(student_interest)
+        );
+        const query =
+          "INSERT INTO program_studi (nama, demand, cost, resources, academic_relevance, student_interest, skor_akhir) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        connection.query(
+          query,
+          [
+            nama,
+            demand,
+            cost,
+            resources,
+            academic_relevance,
+            student_interest,
+            skor_akhir,
+          ],
+          (err) => {
+            if (err) {
+              console.error("Error inserting data:", err);
+              errors = true;
+            }
+          }
+        );
+      });
+      fs.unlinkSync(req.file.path); // Delete the file after processing
+      if (errors) {
+        res
+          .status(500)
+          .send(
+            "Errors occurred while processing the CSV file. Check server logs for details."
+          );
+      } else {
+        res.sendStatus(200);
+      }
+    });
 });
 
 app.listen(port, () => {

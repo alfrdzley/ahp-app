@@ -148,7 +148,7 @@ function showModal(message) {
 }
 
 async function deleteProgram(id) {
-  console.log(`Preparing to delete program with ID: ${id}`);
+  console.log(`Preparing todelete program with ID: ${id}`);
 
   try {
     const response = await fetch(`/programs/${id}`, {
@@ -192,6 +192,32 @@ document
       document.getElementById("exportConfirmationModal")
     );
     exportModal.hide();
+  });
+
+// Event listener for CSV upload form
+document
+  .getElementById("csv-form")
+  .addEventListener("submit", async function (e) {
+    e.preventDefault();
+    const formData = new FormData();
+    const fileField = document.getElementById("csv-file");
+    formData.append("csvfile", fileField.files[0]);
+
+    try {
+      const response = await fetch("/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (response.ok) {
+        showModal("CSV file imported successfully");
+        loadPrograms();
+      } else {
+        alert("Failed to import CSV file");
+      }
+    } catch (error) {
+      console.error("Error importing CSV file:", error);
+    }
   });
 
 loadPrograms();
